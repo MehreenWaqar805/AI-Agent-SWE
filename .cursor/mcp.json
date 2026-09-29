@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "jira-local": {
+      "command": ".venv/bin/python",
+      "args": ["jira-mcp-server/jira_server.py"]
+    },
+    "figma-local": {
+      "command": ".venv/bin/python",
+      "args": ["figma-mcp-server/figma_server.py"]
+    },
+    "github-local": {
+      "command": ".venv/bin/python",
+      "args": ["github-mcp-server/github_server.py"]
+    },
+    "figma": {
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/"
+    }
+  }
+}

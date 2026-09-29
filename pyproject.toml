@@ -1,0 +1,31 @@
+[project]
+name = "ai-swe-agent"
+version = "0.1.0"
+description = "AI Software Engineering Agent that implements Jira tickets from Figma through a reviewed PR."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.28",
+    "mcp>=2.0",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.8",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+cursor = ["cursor-sdk"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+ai-swe-agent = "ai_swe_agent.cli:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["ai_swe_agent*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
