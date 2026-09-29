@@ -13,7 +13,7 @@ struct AppCoordinatorView: View {
                 .tabItem { Label("Search", systemImage: "magnifyingglass") }
                 .tag(AppTab.search)
             WishlistView()
-                .tabItem { Label("Wishlist", systemImage: "heart.fill") }
+                .tabItem { Label("Saved", systemImage: "bookmark.fill") }
                 .tag(AppTab.wishlist)
             RatingView()
                 .tabItem { Label("Rating", systemImage: "star.fill") }

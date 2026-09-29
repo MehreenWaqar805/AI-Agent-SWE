@@ -5,5 +5,7 @@ struct Movie: Identifiable, Hashable, Codable {
     var title: String
     var overview: String
     var posterPath: String?
+    var posterAssetName: String?
     var voteAverage: Double
+    var categories: [String] = []
 }

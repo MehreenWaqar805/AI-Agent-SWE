@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// SCRUM-1 / TM-201 — Home screen (Figma Movies app).
+/// LOCAL-0 — Home screen with exact Figma Movies app posters.
 struct HomeView: View {
     @Environment(AppRouter.self) private var router
     @State private var viewModel = HomeViewModel()
@@ -13,21 +13,20 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: Theme.spacing) {
+                VStack(alignment: .leading, spacing: 24) {
                     header
-                    SearchFieldButton(placeholder: "Search movies") {
+                    SearchFieldButton(placeholder: "Search") {
                         router.openSearch()
                     }
+                    featuredSection
                     categorySection
-                    trendingSection
+                    catalogSection
                 }
                 .padding(.horizontal, Theme.spacing)
                 .padding(.bottom, Theme.spacing)
             }
             .background(Theme.background)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Theme.background, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .navigationBarHidden(true)
             .task {
                 await viewModel.loadTrending()
             }
@@ -40,17 +39,57 @@ struct HomeView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("What do you want to watch?")
-                .font(Theme.titleFont(size: 20))
+                .font(Theme.poppins(size: 18, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
+                .accessibilityAddTraits(.isHeader)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 8)
+        .padding(.top, 12)
+        .padding(.bottom, 4)
+    }
+
+    @ViewBuilder
+    private var featuredSection: some View {
+        if !viewModel.featuredMovies.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .bottom, spacing: 24) {
+                    ForEach(Array(viewModel.featuredMovies.enumerated()), id: \.element.id) { index, movie in
+                        featuredCard(movie, rank: index + 1)
+                    }
+                }
+                .padding(.leading, 12)
+                .padding(.trailing, Theme.spacing)
+                .padding(.bottom, 12)
+            }
+            .padding(.horizontal, -Theme.spacing)
+        }
+    }
+
+    private func featuredCard(_ movie: Movie, rank: Int) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            MoviePosterImage(movie: movie)
+                .frame(width: 145, height: 210)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            Text("\(rank)")
+                .font(Theme.montserrat(size: 72, weight: .bold))
+                .foregroundStyle(Theme.background)
+                .overlay {
+                    Text("\(rank)")
+                        .font(Theme.montserrat(size: 72, weight: .bold))
+                        .foregroundStyle(.clear)
+                        .shadow(color: Theme.textSecondary.opacity(0.9), radius: 0.5)
+                }
+                .offset(x: -18, y: 22)
+        }
+        .frame(width: 145, height: 232, alignment: .top)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(rank). \(movie.title)")
     }
 
     private var categorySection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Category")
-                .font(Theme.titleFont(size: 16))
+                .font(Theme.poppins(size: 16, weight: .semibold))
                 .foregroundStyle(Theme.textPrimary)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
@@ -68,14 +107,16 @@ struct HomeView: View {
             viewModel.selectCategory(category)
         } label: {
             Text(category)
-                .font(Theme.bodyFont(size: 14))
+                .font(Theme.poppins(size: 14, weight: isSelected ? .semibold : .regular))
                 .foregroundStyle(isSelected ? Theme.textPrimary : Theme.textSecondary)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
-                .background(isSelected ? Theme.primary.opacity(0.25) : Theme.surface)
+                .background(isSelected ? Theme.primary : Theme.surface)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(isSelected ? Theme.primary : Theme.card, lineWidth: 1)
+                    if !isSelected {
+                        Capsule(style: .continuous)
+                            .stroke(Theme.card, lineWidth: 1)
+                    }
                 }
                 .clipShape(Capsule())
         }
@@ -84,12 +125,8 @@ struct HomeView: View {
     }
 
     @ViewBuilder
-    private var trendingSection: some View {
+    private var catalogSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Trending")
-                .font(Theme.titleFont(size: 16))
-                .foregroundStyle(Theme.textPrimary)
-
             if viewModel.isLoading && viewModel.movies.isEmpty {
                 ProgressView()
                     .tint(Theme.primary)
@@ -108,7 +145,7 @@ struct HomeView: View {
                 }
             } else if viewModel.movies.isEmpty {
                 ContentUnavailableView(
-                    "No trending movies",
+                    "No movies",
                     systemImage: "film",
                     description: Text("Pull to refresh.")
                 )
