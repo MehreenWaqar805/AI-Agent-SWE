@@ -7,4 +7,13 @@ final class MoviesAppTests: XCTestCase {
         XCTAssertEqual(movie.id, 42)
         XCTAssertEqual(movie.title, "Dune")
     }
+
+    func testOpenSearchSwitchesTab() {
+        let router = AppRouter()
+        XCTAssertEqual(router.selectedTab, .home)
+
+        router.openSearch()
+
+        XCTAssertEqual(router.selectedTab, .search)
+    }
 }
